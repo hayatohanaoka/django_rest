@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',  # Add django rest framework
     'first_rest_api',
+    'second_rest_api',
 ]
 
 MIDDLEWARE = [
@@ -125,9 +126,9 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 #  Django REST framework settings
-REST_FRAMEWORK = {
-    'DEFAULT_RENDERER_CLASSES': [
-        'rest_framework.renderers.JSONRenderer', # APIレスポンスのレンダリング画面を、JSON画面に変更
-    ]
-}
+# REST_FRAMEWORK = {
+#     'DEFAULT_RENDERER_CLASSES': [
+#         'rest_framework.renderers.JSONRenderer', # APIレスポンスのレンダリング画面を、JSON画面に変更
+#     ]
+# }
 
