@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',  # Add django rest framework
     'first_rest_api',
     'second_rest_api',
+    'second_rest_api_ver2',
 ]
 
 MIDDLEWARE = [
