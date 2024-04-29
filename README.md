@@ -42,3 +42,17 @@
         - …が、`Django` が自動生成するクエリのパフォーマンス次第では自作したSQLをもとに処理を行う場合があり得るため、  
         備わっているメソッドを過信しすぎるのは良くない
         - 上記のようなケースでは、プレーンな `Serializer` を使って、 オリジナルに拡張していく形式が望ましいだろう
+### 2024/04/29
+- `rest_framework.permissions`
+    - デフォルトで備わったpermissionsの使い方と、カスタムの方法
+    - `Django` の `settings.py` の `ALLOWED_HOSTS` で設定できる制限に加え、自分のカスタムパーミッションで制限を設けると良さそう
+    - 組み込みパーミッションの一覧<br>
+        | パーミッション名 | 意味 |
+        | :- | :- |
+        | permissions.IsAdminUser | ログインしているかつ、管理者であればアクセス可 |
+        | permissions.IsAuthenticated | ログインしていればアクセス可 |
+        | permissions.IsAuthenticatedOrReadOnly | ログイン済みもしくは、読み取り（GET）の場合はアクセス可 |
+        | permissions.AllowAny | 誰でもアクセス可 |
+- `django` に組み込まれた `User` を、 `rest_framework.serializer.ModelSerializer` で扱う際の注意
+    - `ModelSerializer` の `create` メソッドに任せてしまうと、パスワードの暗号化がされないまま保存されてしまう…
+    - 対応としては、 **`ModelSerializer` を継承して作成した `serializer` の `create` メソッドをオーバーライドし、`Django User` モデルの `.create()` を呼び出す** のが最適
