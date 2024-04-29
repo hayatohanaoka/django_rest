@@ -14,13 +14,13 @@ class BaseListView(APIView):
     """
     リソースの一覧取得と追加の処理を持ったベースView
     """
-    permission_classes = [
-        CustomPermission,
-        # permissions.IsAdminUser,               # ログインしているかつ、管理者であればアクセス可
-        # permissions.IsAuthenticated,           # ログインしていればアクセス可
-        # permissions.IsAuthenticatedOrReadOnly, # ログイン済みもしくは、読み取り（GET）の場合はアクセス可
-        # permissions.AllowAny                   # 誰でもアクセス可
-    ]
+    # permission_classes = [
+    #     # CustomPermission,
+    #     # permissions.IsAdminUser,               # ログインしているかつ、管理者であればアクセス可
+    #     # permissions.IsAuthenticated,           # ログインしていればアクセス可
+    #     # permissions.IsAuthenticatedOrReadOnly, # ログイン済みもしくは、読み取り（GET）の場合はアクセス可
+    #     # permissions.AllowAny                   # 誰でもアクセス可
+    # ]
     def get(self, req, *arg, **kwarg):
         items = self.model.objects.all()
         serializer = self.serializer_class(items, many=True)
