@@ -1,7 +1,39 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
+from django.contrib import auth
 
-from second_rest_api.models import Item
+from second_rest_api.models import Item, Product
+
+class ProductModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = '__all__'
+
+
+class UserModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = auth.get_user_model()
+        fields = ['email', 'username', 'password']
+        extra_kwargs = {
+            'password': {
+                'write_only': True
+            }
+        }
+
+    def create(self, validated_data):
+        """
+        Django の UserManager が持っている保存メソッドを使用する
+        利点： パスワード暗号化保存が使える
+        詳しくはドキュメントを参照
+        https://docs.djangoproject.com/en/5.0/ref/contrib/auth/#django.contrib.auth.models.UserManager.create_user
+        """
+        user = auth.get_user_model()
+        return user.objects.create_user(
+            username=validated_data['username'],
+            email=validated_data['email'],
+            password=validated_data['password']
+        )
+
 
 def min_price_for_discounted(value):
     if value <= 100:
@@ -9,7 +41,7 @@ def min_price_for_discounted(value):
 
 
 # Model serializers を使ってみる
-class ItemModelSerializers(serializers.ModelSerializer):
+class ItemModelSerializer(serializers.ModelSerializer):
     """
     ModelSerializerを継承すると、デフォルトで createメソッド と updateメソッド が定義された状態になる
     ModelSerializer は、 Serializer のサブクラス！
@@ -58,3 +90,21 @@ class ItemModelSerializers(serializers.ModelSerializer):
         if price < discounted_price:
             raise serializers.ValidationError('割引価格は低kがよりも低い値に設定してください')
         return data
+    
+    # def create(self, validated_data):
+    #     return Item.objects.create(**validated_data)
+    
+    # def update(self, instance, validated_data):
+    #     if 'name' in validated_data.keys():
+    #         instance.name = validated_data['name']
+    
+    #     if 'price' in validated_data.keys():
+    #         instance.price = validated_data['price']
+    
+    #     if 'discounted_price' in validated_data.keys():
+    #         instance.discounted_price = validated_data['discounted_price']
+    
+    #     instance.save()
+    #     return instance
+
+
