@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import permissions
 
-from .serializers import ItemModelSerializer, ProductModelSerializer, UserModelSerializer
+from .serializers import ItemModelSerializer, ProductModelSerializer, UserModelSerializer, LoginSerializer
 from .permissions import CustomPermission
 from second_rest_api.models import Item, Product
 
@@ -105,6 +105,32 @@ class UserModelDetailView(BaseDetailView):
     model = auth.get_user_model()
     serializer_class = UserModelSerializer
 
+class LoginView(APIView):
+    
+    permission_classes = [permissions.AllowAny]
+    serializer_class = LoginSerializer
+
+    def post(self, req, *arg, **kwarg):
+        serializer = self.serializer_class(
+            data=self.request.data,
+            context={'req': self.request}
+        )
+        if serializer.is_valid(raise_exception=True):
+            print(serializer.validated_data.keys())
+            user = serializer.validated_data['user']
+            auth.login(req, user)
+            return Response(None, status=status.HTTP_202_ACCEPTED)
+        return Response(None, status=status.HTTP_401_UNAUTHORIZED)
+
+
+class LogoutView(APIView):
+    
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, req, *arg, **kwarg):
+        auth.logout(req)
+        return Response('ログアウトしました', status=status.HTTP_202_ACCEPTED)
+
 
 item_api = ItemModelView.as_view()
 item_detail = ItemModelDetailView.as_view()
@@ -114,3 +140,6 @@ user_detail = UserModelDetailView.as_view()
 
 product_api = ProductModelView.as_view()
 product_detail = ProductModelDetailView.as_view()
+
+login = LoginView.as_view()
+logout = LogoutView.as_view()
