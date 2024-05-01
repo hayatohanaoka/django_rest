@@ -5,8 +5,13 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import permissions
 
-from .serializers import ItemModelSerializer, ProductModelSerializer, UserModelSerializer, LoginSerializer
-from .permissions import CustomPermission
+from .serializers import (
+    ItemModelSerializer,
+    ProductModelSerializer,
+    UserModelSerializer,
+    LoginSerializer
+)
+from .permissions import CustomPermission, ProductPermission
 from second_rest_api.models import Item, Product
 
 # Create your views here.
@@ -39,6 +44,10 @@ class BaseDetailView(APIView):
     リソースの詳細の取得・消去・更新の処理を持ったベースView
     """
 
+    model = None
+    permission_classes = None
+    serializer_class = None
+
     def get(self, req, id):
         try:
             obj = self.model.objects.get(id=id)
@@ -50,20 +59,31 @@ class BaseDetailView(APIView):
         serializer = self.serializer_class(obj)
         return Response(serializer.data)
     
-    def put(self, req, id):
+    def _get_object(self, req, id):
+        """
+        ユーザーとオブジェクトの権限一致を確認する関数
+        """
         obj = self.model.objects.get(id=id)
+        self.check_object_permissions(req, obj)
+        return obj 
+    
+    def put(self, req, id):
+        # obj = self.model.objects.get(id=id)
+        obj = self._get_object(req, id)
         serializer = self.serializer_class(obj, data=req.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
         return Response(serializer.data)
     
     def delete(self, req, id):
-        obj = self.model.objects.get(id=id)
+        # obj = self.model.objects.get(id=id)
+        obj = self._get_object(req, id)
         obj.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
     def patch(self, req, id):
-        obj = self.model.objects.get(id=id)
+        # obj = self.model.objects.get(id=id)
+        obj = self._get_object(req, id)
         serializer = self.serializer_class(obj, data=req.data, partial=True)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
@@ -98,6 +118,7 @@ class ProductModelDetailView(BaseDetailView):
 
     model = Product
     serializer_class = ProductModelSerializer
+    permission_classes = [ProductPermission]
 
 
 class UserModelDetailView(BaseDetailView):

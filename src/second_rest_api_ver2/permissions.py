@@ -8,3 +8,11 @@ class CustomPermission(BasePermission):
             return True
         else:
             return False
+
+
+class ProductPermission(BasePermission):
+
+    def has_object_permission(self, req, view, obj):
+        if req.method not in ['GET', 'HEAD', 'OPTIONS']:
+            return obj.user == req.user
+        return super().has_object_permission(req, view, obj) # True となる
