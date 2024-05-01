@@ -9,6 +9,7 @@
 - [2024/04/27](#20240427)
 - [2024/04/28](#20240428)
 - [2024/04/29](#20240429)
+- [2024/05/02](#20240502)
 ### 2024/04/24
 - Django REST Frameworkとは？
     - `REST API` や `GraphQL` を **Djangoライクな記述で実装** できるサードパーティーライブラリ
@@ -59,3 +60,10 @@
 - `django` に組み込まれた `User` を、 `rest_framework.serializer.ModelSerializer` で扱う際の注意
     - `ModelSerializer` の `create` メソッドに任せてしまうと、パスワードの暗号化がされないまま保存されてしまう…
     - 対応としては、 **`ModelSerializer` を継承して作成した `serializer` の `create` メソッドをオーバーライドし、`Django User` モデルの `.create()` を呼び出す** のが最適
+### 2024/05/02
+- `Permission` のカスタムをさらに深める
+    - オブジェクトに紐づくユーザー以外がデータの更新や削除を行えないようにする
+        - `BasePermission` クラスを継承したクラスで、 `has_object_permission` をオーバーライドする
+            ‐ ライブラリのソースコードでは、常に `True` を返す定義になっている
+            ‐ カスタムした `has_object_permission` の中では、`GET` `HEAD` `OPTIONS` リクエストの時のみ、ユーザーとオブジェクトのユーザーの照合結果を返している
+        - `APIView` を継承したviewsクラスで、 `self.check_object_permissions` を呼び出すことで `has_object_permission` も同時に起動する
