@@ -9,6 +9,7 @@
 - [2024/04/27](#20240427)
 - [2024/04/28](#20240428)
 - [2024/04/29](#20240429)
+- [2024/05/01](#20240501)
 - [2024/05/02](#20240502)
 ### 2024/04/24
 - Django REST Frameworkとは？
@@ -60,10 +61,54 @@
 - `django` に組み込まれた `User` を、 `rest_framework.serializer.ModelSerializer` で扱う際の注意
     - `ModelSerializer` の `create` メソッドに任せてしまうと、パスワードの暗号化がされないまま保存されてしまう…
     - 対応としては、 **`ModelSerializer` を継承して作成した `serializer` の `create` メソッドをオーバーライドし、`Django User` モデルの `.create()` を呼び出す** のが最適
-### 2024/05/02
+### 2024/05/01
 - `Permission` のカスタムをさらに深める
     - オブジェクトに紐づくユーザー以外がデータの更新や削除を行えないようにする
         - `BasePermission` クラスを継承したクラスで、 `has_object_permission` をオーバーライドする
             ‐ ライブラリのソースコードでは、常に `True` を返す定義になっている
             ‐ カスタムした `has_object_permission` の中では、`GET` `HEAD` `OPTIONS` リクエストの時のみ、ユーザーとオブジェクトのユーザーの照合結果を返している
         - `APIView` を継承したviewsクラスで、 `self.check_object_permissions` を呼び出すことで `has_object_permission` も同時に起動する
+### 2024/05/02
+- `Token` を使った認証の方法を学習
+    - `res_framework.authtoken` を使って実装した
+    - トークン認証を信じられないくらいに楽に実装できた反面、処理がブラックボックスなので少し怖い…
+        - `settings.py` の `INSTALLED_APP` に `''rest_framework.authtoken','` を追加
+        - `views.py` に `from rest_framework.authentication import TokenAuthentication` を追加して、`permission_classes` に `TokenAuthentication` を追加
+- `drf_spectacular` を使った swagger のような開発画面の実装
+    - これも非常に画期的で、わずか数行のコードでクライアントから簡単にリクエストが飛ばせるUI画面が作れる
+        - `settings.py` に、以下を追加  
+            ```
+            INSTALLED_APPS = [
+                …(Some default and your apps)
+                'drf_spectacular',           # Add drf spectacular
+                …(Some default and your apps)
+            ]
+            # spectacular用の設定
+            REST_FRAMEWORK = {
+                'DEFAULT_PERMISSION_CLASSES': [
+                    'rest_framework.permissions.IsAuthenticatedOrReadOnly'
+                ],
+                'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+                'DEFAULT_AUTHENTICATION_CLASSES': [
+                    'rest_framework.authentication.TokenAuthentication'
+                ]
+            }
+            ```
+        - プロジェクトディレクトリ配下の `urls.py` に以下を追加
+            ```
+            from drf_spectacular.views import (
+                SpectacularAPIView,
+                SpectacularRedocView,
+                SpectacularSwaggerView
+            )
+            urlpatterns = [
+                …(some default and your app urls)
+                path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+                # api/schema の情報を読み込んで、swagger に似た画面を生成するViewを起動
+                path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+                path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+                …(some default and your app urls)
+            ]
+            ```
+        - これでOK。 `https://…/api/schema/swagger-ui/` にアクセスして、画面の挙動を確認する
+    - この画面から、ログイン・トークン認証・リクエストレスポンスの挙動確認等が可能になる
