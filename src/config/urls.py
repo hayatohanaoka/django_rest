@@ -16,10 +16,22 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework.authtoken import views
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularRedocView,
+    SpectacularSwaggerView
+)
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('first_rest_api.urls')),
+    # path('api/', include('first_rest_api.urls')),
     path('api2/', include('second_rest_api.urls')),
     path('api2/v2/', include('second_rest_api_ver2.urls')),
+    path('api_token_auth/', views.obtain_auth_token),
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    # api/schema の情報を読み込んで、swagger に似た画面を生成するViewを起動
+    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 ]

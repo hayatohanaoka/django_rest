@@ -1,9 +1,9 @@
 from django.contrib import auth
 from django.shortcuts import render
-from rest_framework.views import APIView
+from rest_framework import status, permissions
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.response import Response
-from rest_framework import status
-from rest_framework import permissions
+from rest_framework.views import APIView
 
 from .serializers import (
     ItemModelSerializer,
@@ -45,7 +45,7 @@ class BaseDetailView(APIView):
     """
 
     model = None
-    permission_classes = None
+    permission_classes = []
     serializer_class = None
 
     def get(self, req, id):
@@ -98,14 +98,15 @@ class ItemModelView(BaseListView):
 
 class ProductModelView(BaseListView):
     
-    serializer_class = ProductModelSerializer
     model = Product
+    serializer_class = ProductModelSerializer
+    authentication_classes = [TokenAuthentication]
 
 
 class UserModelView(BaseListView):
 
-    serializer_class = UserModelSerializer
     model = auth.get_user_model()
+    serializer_class = UserModelSerializer
 
 
 class ItemModelDetailView(BaseDetailView):

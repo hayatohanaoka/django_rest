@@ -37,8 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',  # Add django rest framework
-    'first_rest_api',
+    'drf_spectacular',           # Add drf spectacular
+    'rest_framework',            # Add django rest framework
+    'rest_framework.authtoken',  # Add django rest framework auth
+    # 'first_rest_api',
     'second_rest_api',
     'second_rest_api_ver2',
 ]
@@ -132,9 +134,20 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #         'rest_framework.renderers.JSONRenderer', # APIレスポンスのレンダリング画面を、JSON画面に変更
 #     ]
 # }
+# REST_FRAMEWORK = {
+#     'DEFAULT_PERMISSION_CLASSES': [
+#         'rest_framework.permissions.IsAuthenticated',
+#     ]
+# }
+
+# spectacular用の設定
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly'
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication'
     ]
 }
 
