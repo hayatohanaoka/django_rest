@@ -7,7 +7,8 @@ def min_price_for_discounted(value):
 
 
 class ItemSerializers(serializers.Serializer):
-    id = serializers.ReadOnlyField()
+    # id = serializers.ReadOnlyField()
+    id = serializers.CharField(read_only=True)
     name = serializers.CharField(max_length=20)
     price = serializers.IntegerField(min_value=0)
     discounted_price = serializers.IntegerField(min_value=0, validators=[min_price_for_discounted])

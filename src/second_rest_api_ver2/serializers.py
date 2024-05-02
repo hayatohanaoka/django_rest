@@ -108,3 +108,24 @@ class ItemModelSerializer(serializers.ModelSerializer):
     #     return instance
 
 
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField(write_only=True)
+    password = serializers.CharField(
+        style={'input_type': 'password'},
+        write_only=True
+    )
+
+    def validate(self, data):
+        username, password = data['username'], data['password']
+
+        if username and password:
+            user = auth.authenticate(
+                request=self.context['req'],
+                username=username,
+                password=password
+            )
+            if user:
+                data['user'] = user
+                return data
+            raise serializers.ValidationError('Login failed')
+        raise serializers.ValidationError('Required both username and password')
