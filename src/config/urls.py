@@ -29,6 +29,7 @@ urlpatterns = [
     # path('api/', include('first_rest_api.urls')),
     path('api2/', include('second_rest_api.urls')),
     path('api2/v2/', include('second_rest_api_ver2.urls')),
+    path('generic_api/', include('generic_api.urls')),
     path('api_token_auth/', views.obtain_auth_token),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     # api/schema の情報を読み込んで、swagger に似た画面を生成するViewを起動

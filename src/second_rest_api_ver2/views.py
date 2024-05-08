@@ -133,16 +133,16 @@ class LoginView(APIView):
     serializer_class = LoginSerializer
 
     def post(self, req, *arg, **kwarg):
-        serializer = self.serializer_class(
-            data=self.request.data,
-            context={'req': self.request}
-        )
+        serializer = self.serializer_class(data=self.request.data)
         if serializer.is_valid(raise_exception=True):
-            print(serializer.validated_data.keys())
-            user = serializer.validated_data['user']
-            auth.login(req, user)
-            return Response(None, status=status.HTTP_202_ACCEPTED)
-        return Response(None, status=status.HTTP_401_UNAUTHORIZED)
+            user = auth.authenticate(
+                request=req,
+                username=serializer.validated_data['username'],
+                password=serializer.validated_data['password']
+            )
+            auth.login(request=req, user=user)
+            return Response('ログイン成功', status=status.HTTP_202_ACCEPTED)
+        return Response('ログイン失敗', status=status.HTTP_401_UNAUTHORIZED)
 
 
 class LogoutView(APIView):

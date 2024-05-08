@@ -116,16 +116,7 @@ class LoginSerializer(serializers.Serializer):
     )
 
     def validate(self, data):
-        username, password = data['username'], data['password']
-
-        if username and password:
-            user = auth.authenticate(
-                request=self.context['req'],
-                username=username,
-                password=password
-            )
-            if user:
-                data['user'] = user
-                return data
-            raise serializers.ValidationError('Login failed')
-        raise serializers.ValidationError('Required both username and password')
+        data_keys = data.keys()
+        if 'username' not in data_keys or 'password' not in data_keys:
+            raise serializers.ValidationError('ログイン情報が不足しています')
+        return data
