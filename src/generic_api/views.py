@@ -7,13 +7,18 @@ from rest_framework.generics import (
     ListAPIView,
     CreateAPIView,
     ListCreateAPIView,
-    RetrieveUpdateDestroyAPIView
+    RetrieveUpdateDestroyAPIView,
+    RetrieveDestroyAPIView
 )
 
 from .models import Comment, Post
 from .serializers import CommentSerializer, PostSerializer, UserCreateSerializer, UserLoginSerializer
 
 # Create your views here.
+class CommentRetrieveDestroyAPIView(RetrieveDestroyAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    lookup_field = 'id'
 
 
 class CommentListCreateAPIView(ListCreateAPIView):
@@ -63,7 +68,6 @@ class PostApiView(ListCreateAPIView):
 
     def get_queryset(self):
         posts = Post.objects.prefetch_related('comments').all()
-        print(posts)
         return posts
 
     def perform_create(self, serializer):
@@ -90,8 +94,10 @@ class UserLoginAPIView(APIView):
             return Response('ログイン成功', status=status.HTTP_202_ACCEPTED)
         return Response('ログイン失敗', status=status.HTTP_401_UNAUTHORIZED)
 
+
 post_api_views = PostApiView.as_view()
 user_create_view = UserCreateView.as_view()
 user_login_view = UserLoginAPIView.as_view()
 post_detail_view = PostAPIDetailView.as_view()
 comment_list_create_view = CommentListCreateAPIView.as_view()
+comment_retrieve_destroy_view = CommentRetrieveDestroyAPIView.as_view()

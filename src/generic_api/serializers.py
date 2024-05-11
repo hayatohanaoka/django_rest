@@ -1,23 +1,33 @@
 from rest_framework import serializers
 from django.contrib import auth
+from django.urls import reverse
 
 from .models import Post, Comment
 
 class CommentSerializer(serializers.ModelSerializer):
+    detail_url = serializers.SerializerMethodField()  # get_変数名のメソッドを定義して、そこで値を受け取る
+    
     class Meta:
         model = Comment
-        fields = ('id', 'post', 'comment', 'author', 'created_at')
+        fields = ('id', 'post', 'comment', 'author', 'created_at', 'detail_url')
         read_only_fields = ('id', 'post', 'author', 'created_at')
+
+    def get_detail_url(self, obj):  # get_(serializers.SerializerMethodField()で定義した変数名)
+        return reverse('comment_retrieve_destroy', kwargs={ 'post_id': obj.post_id, 'id': obj.id })  # URLの名前から逆引き
 
 
 class PostSerializer(serializers.ModelSerializer):
 
     comments = CommentSerializer(many=True, read_only=True)
+    detail_url = serializers.SerializerMethodField()  # get_変数名のメソッドを定義して、そこで値を受け取る
 
     class Meta:
         model = Post
-        fields = ('id', 'title', 'content', 'author', 'created_at', 'comments')
+        fields = ('id', 'title', 'content', 'author', 'created_at', 'comments', 'detail_url')
         read_only_fields = ('author', 'created_at')
+    
+    def get_detail_url(self, obj):  # get_(serializers.SerializerMethodField()で定義した変数名)
+        return reverse('post_detail', kwargs={ 'id': obj.id })  # URLの名前から逆引き
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
