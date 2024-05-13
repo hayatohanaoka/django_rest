@@ -5,6 +5,7 @@ from . import views
 urlpatterns = [
     path('posts/', views.post_api_views, name='posts'),
     path('post/<int:id>/', views.post_detail_view, name='post_detail'),
+    path('post/<title>/', views.post_filter_view, name='post_filter'),
     path('post/<int:post_id>/comments/',
         views.comment_list_create_view, name='comments'),
     path('post/<int:post_id>/comments/<int:id>/',
