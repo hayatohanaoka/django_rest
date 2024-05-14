@@ -19,10 +19,25 @@ from .serializers import CommentSerializer, PostSerializer, UserCreateSerializer
 from .filters import CustomFilterBackend, PostFilter
 
 # Create your views here.
-class CommentRetrieveDestroyAPIView(RetrieveDestroyAPIView):
+class CommentRetrieveDestroyAPIView(RetrieveUpdateDestroyAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     lookup_field = 'id'
+
+    def perform_update(self, serializer):
+        comment = self.get_object()
+        self._confirm_user(self.request, comment)
+        serializer.save()
+    
+    def perform_destroy(self, instance):
+        comment = self.get_object()
+        self._confirm_user(self.request, comment)
+        instance.delete()
+    
+    def _confirm_user(self, req, instance):
+        if req.user.id != instance.author.id:
+            raise PermissionError('User is not matched')
 
 
 class CommentListCreateAPIView(ListCreateAPIView):
@@ -36,11 +51,14 @@ class CommentListCreateAPIView(ListCreateAPIView):
             return Comment.objects.filter(post_id=post_id)
 
     def perform_create(self, serializer):
-        post_id = self.kwargs['post_id']
-        serializer.save(
-            author=self.request.user,
-            post_id=post_id
-        )
+        kwarg_keys = self.kwargs.keys()
+        if 'post_id' in kwarg_keys:
+            post_id = self.kwargs['post_id']
+            serializer.save(
+                author=self.request.user,
+                post_id=post_id
+            )
+
 """
 class CommentListCreateAPIView(ListCreateAPIView):
     queryset = Comment.objects.all()
