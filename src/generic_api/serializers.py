@@ -13,7 +13,7 @@ class CommentSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'post', 'author', 'created_at')
 
     def get_detail_url(self, obj):  # get_(serializers.SerializerMethodField()で定義した変数名)
-        return reverse('comment_retrieve_destroy', kwargs={ 'post_id': obj.post_id, 'id': obj.id })  # URLの名前から逆引き
+        return reverse('comment_retrieve_destroy', kwargs={ 'post_id': obj.post_id, 'cmt_id': obj.id })  # URLの名前から逆引き
 
 
 class PostSerializer(serializers.ModelSerializer):

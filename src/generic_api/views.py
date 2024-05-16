@@ -22,7 +22,8 @@ from .filters import CustomFilterBackend, PostFilter
 class CommentRetrieveDestroyAPIView(RetrieveUpdateDestroyAPIView):
     serializer_class = CommentSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-    lookup_field = 'id'
+    lookup_url_kwarg = 'cmt_id'
+    lookup_field = 'id'  # comment のフィルターに適用するカラム
 
     def get_queryset(self):
         post_id = self.kwargs['post_id']
