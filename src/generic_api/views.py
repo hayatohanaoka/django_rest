@@ -20,10 +20,13 @@ from .filters import CustomFilterBackend, PostFilter
 
 # Create your views here.
 class CommentRetrieveDestroyAPIView(RetrieveUpdateDestroyAPIView):
-    queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     lookup_field = 'id'
+
+    def get_queryset(self):
+        post_id = self.kwargs['post_id']
+        return Comment.objects.filter(post_id=post_id)
 
     def perform_update(self, serializer):
         comment = self.get_object()
@@ -46,9 +49,8 @@ class CommentListCreateAPIView(ListCreateAPIView):
     lookup_field = 'post_id'
 
     def get_queryset(self):
-        if 'post_id' not in self.kwargs.keys():     
-            post_id = self.kwargs['post_id']
-            return Comment.objects.filter(post_id=post_id)
+        post_id = self.kwargs['post_id']
+        return Comment.objects.filter(post_id=post_id)
 
     def perform_create(self, serializer):
         kwarg_keys = self.kwargs.keys()
